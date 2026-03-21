@@ -16,8 +16,7 @@ const Login = () => {
         password: values.password,
       });
 
-      // Based on common API patterns, we try to extract the token
-      const token = response.data?.data?.token || response.data?.token || response.data?.data?.access_token || response.data?.access_token;
+      const token = response.data?.data?.token || response.data?.token || response.data?.data?.access_token || response.data?.access_token || response.data?.data?.accessToken || response.data?.accessToken;
       
       if (token) {
         localStorage.setItem('access_token', token);
