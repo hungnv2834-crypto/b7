@@ -23,7 +23,6 @@ const Login = () => {
         message.success('Đăng nhập thành công!');
         navigate('/dashboard');
       } else if (response.data?.data && typeof response.data.data === 'string') {
-        // Sometimes backend just returns token as string in data
         localStorage.setItem('access_token', response.data.data);
         message.success('Đăng nhập thành công!');
         navigate('/dashboard');

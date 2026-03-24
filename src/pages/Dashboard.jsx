@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Menu, Card, Descriptions, Spin, Button, message, Tag } from 'antd';
-import { UserOutlined, LogoutOutlined, DashboardOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { Layout, Menu, Button, message } from 'antd';
+import { UserOutlined, LogoutOutlined, DashboardOutlined, TeamOutlined } from '@ant-design/icons';
+import { useNavigate, useLocation, Outlet, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const { Header, Content, Sider } = Layout;
@@ -10,6 +10,7 @@ const Dashboard = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -30,7 +31,7 @@ const Dashboard = () => {
         const userData = response.data?.data || response.data;
         setUserInfo(userData);
       } catch (error) {
-        console.error('Lỗi lấy thông tin:', error);
+        console.error(error);
         if (error.response?.status === 401 || error.response?.status === 403) {
            message.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
         } else {
@@ -51,15 +52,27 @@ const Dashboard = () => {
     navigate('/login');
   };
 
+  const getSelectedKey = () => {
+    if (location.pathname.includes('/student')) return 'student';
+    if (location.pathname.includes('/teacher')) return 'teacher';
+    return 'overview';
+  };
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider breakpoint="lg" collapsedWidth="0">
         <div style={{ height: '32px', margin: '16px', color: 'white', textAlign: 'center', fontSize: '18px', fontWeight: 'bold' }}>
           Admin Dashboard
         </div>
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-          <Menu.Item key="1" icon={<DashboardOutlined />}>
-            Tổng quan
+        <Menu theme="dark" mode="inline" selectedKeys={[getSelectedKey()]}>
+          <Menu.Item key="overview" icon={<DashboardOutlined />}>
+            <Link to="/dashboard">Tổng quan</Link>
+          </Menu.Item>
+          <Menu.Item key="student" icon={<TeamOutlined />}>
+            <Link to="/dashboard/student">Sinh viên</Link>
+          </Menu.Item>
+          <Menu.Item key="teacher" icon={<TeamOutlined />}>
+            <Link to="/dashboard/teacher">Giảng viên</Link>
           </Menu.Item>
         </Menu>
       </Sider>
@@ -72,31 +85,8 @@ const Dashboard = () => {
               </Button>
             </div>
         </Header>
-        <Content style={{ margin: '24px 16px', padding: 24, minHeight: 280 }}>
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '100px 0' }}>
-              <Spin size="large" tip="Đang tải thông tin..." />
-            </div>
-          ) : userInfo ? (
-            <Card title={<><UserOutlined/> Thông tin tài khoản</>} bordered={false} style={{ width: '100%', maxWidth: 800, margin: '0 auto', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-              <Descriptions bordered column={1} size="middle">
-                <Descriptions.Item label="Email">{userInfo.email || <Tag color="warning">Chưa cập nhật</Tag>}</Descriptions.Item>
-                <Descriptions.Item label="Quyền hạn (Role)">
-                  {userInfo.role ? <Tag color="blue">{userInfo.role}</Tag> : <Tag color="default">USER</Tag>}
-                </Descriptions.Item>
-                <Descriptions.Item label="Trạng thái">
-                  <Tag color="success">Hoạt động</Tag>
-                </Descriptions.Item>
-                <Descriptions.Item label="Tất cả thông tin (Raw Data)">
-                  <pre style={{ margin: 0, padding: '10px', background: '#f5f5f5', borderRadius: '4px', overflowX: 'auto' }}>
-                    {JSON.stringify(userInfo, null, 2)}
-                  </pre>
-                </Descriptions.Item>
-              </Descriptions>
-            </Card>
-          ) : (
-            <div style={{ textAlign: 'center', padding: '50px' }}>Không tải được thông tin cá nhân.</div>
-          )}
+        <Content style={{ margin: '24px 16px', padding: 24, minHeight: 280, background: '#fff' }}>
+          <Outlet context={{ userInfo, loading }} />
         </Content>
       </Layout>
     </Layout>
