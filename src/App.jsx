@@ -4,6 +4,8 @@ import Dashboard from './pages/Dashboard';
 import Overview from './pages/Overview';
 import Student from './pages/Student';
 import Teacher from './pages/Teacher';
+import Subject from './pages/Subject';
+import Chapter from './pages/Chapter';
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
           <Route index element={<Overview />} />
           <Route path="student" element={<Student />} />
           <Route path="teacher" element={<Teacher />} />
+          <Route path="subject" element={<Subject />} />
+          <Route path="chapter" element={<Chapter />} />
         </Route>
       </Routes>
     </div>
